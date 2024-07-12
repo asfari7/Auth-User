@@ -3,6 +3,14 @@ const prisma = new PrismaClient();
 
 const verifyOtp = async (req, res, next) => {
   const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    res.status(400).json({
+      status: "false",
+      message: "Email and OTP are required",
+    });
+  }
+
   try {
     const user = await prisma.verification_user.findFirst({
       where: {
