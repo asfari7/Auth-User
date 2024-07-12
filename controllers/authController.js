@@ -74,4 +74,30 @@ const activation = async (req, res) => {
   }
 };
 
-module.exports = { signUp, activation };
+const resetPassword = async (req, res) => {
+  const { email, password } = req.body;
+  const hashedPassword = await hashPassword(password);
+
+  try {
+    await prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        password: hashedPassword,
+        is_verified: true,
+      },
+    });
+    res.json({
+      status: "true",
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "false",
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { signUp, activation, resetPassword };
