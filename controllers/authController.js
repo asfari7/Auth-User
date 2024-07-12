@@ -51,39 +51,27 @@ const signUp = async (req, res) => {
   }
 };
 
-const verifyOtp = async (req, res) => {
-  const { email, otp } = req.body;
+const activation = async (req, res) => {
+  const { email } = req.body;
   try {
-    const user = await prisma.verification_user.findFirst({
+    await prisma.user.update({
       where: {
         email,
       },
+      data: {
+        is_verified: true,
+      },
     });
-    if (user.otp === otp && user.createAt < Date.now() - 60 * 1000) {
-      res.status(400).json({ message: "OTP expired" });
-    } else if (user.otp === otp) {
-      await prisma.verification_user.delete({
-        where: {
-          email,
-        },
-      });
-
-      await prisma.user.update({
-        where: {
-          email,
-        },
-        data: {
-          is_verified: true,
-        },
-      });
-
-      res.json({ message: "OTP verified" });
-    } else {
-      res.status(400).json({ message: "Invalid OTP" });
-    }
+    res.json({
+      status: "true",
+      message: "User verified successfully",
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({
+      status: "false",
+      message: error.message,
+    });
   }
 };
 
-module.exports = { signUp, verifyOtp };
+module.exports = { signUp, activation };
