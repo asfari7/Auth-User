@@ -2,6 +2,7 @@ const { PrismaClient } = require("../prisma");
 const { hashPassword, comparePassword } = require("../utils/hash");
 const generateUuid = require("../utils/generateUuid");
 const { sendOtp } = require("../services/otpService");
+const jwt = require("jsonwebtoken");
 
 const prisma = new PrismaClient();
 
@@ -100,4 +101,51 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { signUp, activation, resetPassword };
+const signIn = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({
+      status: "false",
+      message: "Email and password is required",
+    });
+  }
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      res.status(400).json({
+        status: "false",
+        message: "Invalid credentials",
+      });
+    }
+    const token = jwt.sign({ uuid: user.uuid }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+    req.session.token = token;
+    res.json({
+      status: "true",
+      message: "User logged in successfully",
+      data: {
+        user: {
+          uuid: user.uuid,
+          name: user.name,
+          email: user.email,
+        },
+        token,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "false",
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { signUp, activation, resetPassword, signIn };
