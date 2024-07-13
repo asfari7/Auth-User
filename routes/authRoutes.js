@@ -15,7 +15,7 @@ const { requestOtp } = require("../services/otpService");
 router.post("/signup", verifyUnique, signUp);
 router.post("/activation", verifyOtp, activation);
 router.post("/request-otp", requestOtp);
-router.post("/signin", signIn);
+router.post("/signin", signIn, requestOtp);
 
 router.put("/reset-password", verifyOtp, resetPassword);
 

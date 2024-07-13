@@ -32,7 +32,7 @@ const signUp = async (req, res) => {
       },
     });
     await sendOtp(email);
-    sendSuccess(
+    return sendSuccess(
       res,
       { uuid: user.uuid, name: user.name, email: user.email },
       "User created successfully"
@@ -53,13 +53,13 @@ const activation = async (req, res) => {
         is_verified: true,
       },
     });
-    sendSuccess(
+    return sendSuccess(
       res,
       { uuid: user.uuid, name: user.name, email: user.email },
       "User activated successfully"
     );
   } catch (error) {
-    sendError(res, error.message, 400);
+    return sendError(res, error.message, 400);
   }
 };
 
@@ -77,17 +77,17 @@ const resetPassword = async (req, res) => {
         is_verified: true,
       },
     });
-    sendSuccess(
+    return sendSuccess(
       res,
       { uuid: user.uuid, name: user.name, email: user.email },
       "Password reset successfully"
     );
   } catch (error) {
-    sendError(res, error.message, 400);
+    return sendError(res, error.message, 400);
   }
 };
 
-const signIn = async (req, res) => {
+const signIn = async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -100,7 +100,17 @@ const signIn = async (req, res) => {
         email,
       },
     });
+
+    if (!user) {
+      return sendError(res, "User not found", 404);
+    } else {
+      if (user.is_verified === false) {
+        next();
+      }
+    }
+
     const isMatch = await comparePassword(password, user.password);
+
     if (isMatch) {
       const token = jwt.sign(
         { uuid: user.uuid, name: user.name },
