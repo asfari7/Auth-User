@@ -1,14 +1,13 @@
 const { PrismaClient } = require("../prisma");
+const { sendError } = require("../utils/responseUtils");
+
 const prisma = new PrismaClient();
 
 const verifyOtp = async (req, res, next) => {
   const { email, otp } = req.body;
 
   if (!email || !otp) {
-    res.status(400).json({
-      status: "false",
-      message: "Email and OTP are required",
-    });
+    return sendError(res, "Email and OTP is required", 400);
   }
 
   try {
@@ -17,29 +16,22 @@ const verifyOtp = async (req, res, next) => {
         email,
       },
     });
+
     if (user.otp !== otp) {
-      res.status(400).json({
-        status: "false",
-        message: "Invalid OTP",
-      });
+      return sendError(res, "Invalid OTP", 400);
     } else if (user.createAt < Date.now() - 60 * 1000) {
-      res.status(400).json({
-        status: "false",
-        message: "OTP expired",
-      });
+      return sendError(res, "OTP expired", 400);
     } else {
       await prisma.verification_user.delete({
         where: {
           email,
         },
       });
+
       next();
     }
   } catch (error) {
-    res.status(400).json({
-      status: "false",
-      message: error.message,
-    });
+    return sendError(res, error.message, 400);
   }
 };
 

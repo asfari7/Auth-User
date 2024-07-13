@@ -1,6 +1,11 @@
 const { PrismaClient } = require("../prisma");
 const { hashPassword, comparePassword } = require("../utils/hash");
 const generateUuid = require("../utils/generateUuid");
+const {
+  sendSuccess,
+  sendError,
+  sendResponse,
+} = require("../utils/responseUtils");
 const { sendOtp } = require("../services/otpService");
 const jwt = require("jsonwebtoken");
 
@@ -12,15 +17,9 @@ const signUp = async (req, res) => {
   const uuid = generateUuid();
 
   if (!email || !password) {
-    return res.status(400).json({
-      status: "false",
-      message: "Email and password is required",
-    });
+    return sendError(res, "Email and password is required", 400);
   } else if (password.length < 6) {
-    return res.status(400).json({
-      status: "false",
-      message: "Password must be at least 6 characters",
-    });
+    return sendError(res, "Password must be at least 6 characters", 400);
   }
 
   try {
@@ -32,30 +31,21 @@ const signUp = async (req, res) => {
         password: hashedPassword,
       },
     });
-    res.json({
-      status: "true",
-      message: "User created successfully",
-      data: {
-        user: {
-          uuid: user.uuid,
-          name: user.name,
-          email: user.email,
-        },
-      },
-    });
     await sendOtp(email);
+    sendSuccess(
+      res,
+      { uuid: user.uuid, name: user.name, email: user.email },
+      "User created successfully"
+    );
   } catch (error) {
-    res.status(400).json({
-      status: "false",
-      message: error.message,
-    });
+    return sendError(res, error.message, 400);
   }
 };
 
 const activation = async (req, res) => {
   const { email } = req.body;
   try {
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: {
         email,
       },
@@ -63,15 +53,13 @@ const activation = async (req, res) => {
         is_verified: true,
       },
     });
-    res.json({
-      status: "true",
-      message: "User verified successfully",
-    });
+    sendSuccess(
+      res,
+      { uuid: user.uuid, name: user.name, email: user.email },
+      "User activated successfully"
+    );
   } catch (error) {
-    res.status(400).json({
-      status: "false",
-      message: error.message,
-    });
+    sendError(res, error.message, 400);
   }
 };
 
@@ -80,7 +68,7 @@ const resetPassword = async (req, res) => {
   const hashedPassword = await hashPassword(password);
 
   try {
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: {
         email,
       },
@@ -89,15 +77,13 @@ const resetPassword = async (req, res) => {
         is_verified: true,
       },
     });
-    res.json({
-      status: "true",
-      message: "Password reset successfully",
-    });
+    sendSuccess(
+      res,
+      { uuid: user.uuid, name: user.name, email: user.email },
+      "Password reset successfully"
+    );
   } catch (error) {
-    res.status(400).json({
-      status: "false",
-      message: error.message,
-    });
+    sendError(res, error.message, 400);
   }
 };
 
@@ -105,10 +91,7 @@ const signIn = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(400).json({
-      status: "false",
-      message: "Email and password is required",
-    });
+    return sendError(res, "Email and password is required", 400);
   }
 
   try {
@@ -118,33 +101,25 @@ const signIn = async (req, res) => {
       },
     });
     const isMatch = await comparePassword(password, user.password);
-    if (!isMatch) {
-      res.status(400).json({
-        status: "false",
-        message: "Invalid credentials",
-      });
+    if (isMatch) {
+      const token = jwt.sign(
+        { uuid: user.uuid, name: user.name },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "24h",
+        }
+      );
+      req.session.token = token;
+      return sendSuccess(
+        res,
+        { uuid: user.uuid, name: user.name, email: user.email, token },
+        "User signed in successfully"
+      );
+    } else {
+      return sendError(res, "Invalid credentials", 400);
     }
-    const token = jwt.sign({ uuid: user.uuid }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
-    req.session.token = token;
-    res.json({
-      status: "true",
-      message: "User logged in successfully",
-      data: {
-        user: {
-          uuid: user.uuid,
-          name: user.name,
-          email: user.email,
-        },
-        token,
-      },
-    });
   } catch (error) {
-    res.status(400).json({
-      status: "false",
-      message: error.message,
-    });
+    return sendError(res, error.message, 400);
   }
 };
 

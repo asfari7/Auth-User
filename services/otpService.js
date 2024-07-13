@@ -1,6 +1,7 @@
 const { PrismaClient } = require("../prisma");
 const { sendMail } = require("../utils/sendMail");
 const { generateOTP } = require("../utils/otpGenerator");
+const { sendSuccess, sendError } = require("../utils/responseUtils");
 
 const prisma = new PrismaClient();
 
@@ -28,7 +29,7 @@ const requestOtp = async (req, res) => {
     const otp = generateOTP();
 
     if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+      return sendError(res, "Email is required", 400);
     }
 
     const data = await prisma.verification_user.findUnique({
@@ -38,11 +39,13 @@ const requestOtp = async (req, res) => {
     });
 
     if (!data) {
-      return res.status(400).json({ message: "Email not found" });
+      return sendError(res, "Email not found", 400);
     } else if (data.createAt > Date.now() - 60 * 1000) {
-      return res
-        .status(400)
-        .json({ message: "OTP already sent, wait one minute to resend OTP" });
+      return sendError(
+        res,
+        "Please wait for 1 minute before requesting another OTP",
+        400
+      );
     } else {
       await sendMail(email, otp);
 
@@ -57,9 +60,9 @@ const requestOtp = async (req, res) => {
       });
     }
 
-    res.status(200).json({ message: "OTP sent successfully" });
+    return sendSuccess(res, { email }, "OTP sent");
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendError(res, error.message, 400);
   }
 };
 
