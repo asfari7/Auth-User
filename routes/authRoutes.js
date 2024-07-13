@@ -20,15 +20,16 @@ router.post("/signin", signIn);
 router.put("/reset-password", verifyOtp, resetPassword);
 
 router.get("/user-data", authenticateJWT, (req, res) => {
-  const userUuid = req.user;
+  const user = req.user;
 
   res.json({
     status: "true",
     message: "User data fetched successfully",
     data: {
-      uuid: userUuid.uuid,
-      iat: userUuid.iat,
-      exp: userUuid.exp,
+      uuid: user.uuid,
+      name: user.name,
+      iat: user.iat,
+      exp: user.exp,
     },
   });
 });

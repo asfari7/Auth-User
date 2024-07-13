@@ -1,4 +1,5 @@
 const { PrismaClient } = require("../prisma");
+const { sendSuccess, sendError } = require("../utils/responseUtils");
 
 const prisma = new PrismaClient();
 
@@ -11,17 +12,11 @@ const verifyUnique = async (req, res, next) => {
       },
     });
     if (user) {
-      return res.status(400).json({
-        status: "false",
-        message: "User already exists",
-      });
+      return sendError(res, "User already exists", 400);
     }
     next();
   } catch (error) {
-    res.status(400).json({
-      status: "false",
-      message: error.message,
-    });
+    return sendError(res, error.message, 400);
   }
 };
 
