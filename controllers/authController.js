@@ -103,15 +103,15 @@ const signIn = async (req, res, next) => {
 
     if (!user) {
       return sendError(res, "User not found", 404);
-    } else {
-      if (user.is_verified === false) {
-        next();
-      }
     }
 
     const isMatch = await comparePassword(password, user.password);
 
-    if (isMatch) {
+    if (!isMatch) {
+      return sendError(res, "Invalid credentials", 400);
+    } else if (!user.is_verified && isMatch) {
+      return sendError(res, "User not activated", 400);
+    } else {
       const token = jwt.sign(
         { uuid: user.uuid, name: user.name },
         process.env.JWT_SECRET,
@@ -125,8 +125,6 @@ const signIn = async (req, res, next) => {
         { uuid: user.uuid, name: user.name, email: user.email, token },
         "User signed in successfully"
       );
-    } else {
-      return sendError(res, "Invalid credentials", 400);
     }
   } catch (error) {
     return sendError(res, error.message, 400);
