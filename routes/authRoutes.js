@@ -12,10 +12,10 @@ const { verifyOtp } = require("../middleware/verifyOtp");
 const { authenticateJWT } = require("../middleware/authenticateJWT");
 const { requestOtp } = require("../services/otpService");
 
-router.post("/signup", verifyUnique, signUp);
+router.post("/signUp", verifyUnique, signUp);
 router.post("/activation", verifyOtp, activation);
 router.post("/request-otp", requestOtp);
-router.post("/signin", signIn, requestOtp);
+router.post("/signIn", signIn);
 
 router.put("/reset-password", verifyOtp, resetPassword);
 

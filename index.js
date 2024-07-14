@@ -4,14 +4,20 @@ const session = require("express-session");
 const indexRoutes = require("./routes/indexRoutes");
 
 const app = express();
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+  optionSuccessStatus: 200,
+};
 
 app.use(express.json());
+app.use(cors(corsOptions));
 app.use(
   session({
     secret: "secret",
     resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 3600000 * 24, secure: false, sameSite: "strict" },
+    saveUninitialized: true,
+    cookie: { maxAge: 3600000 * 24, secure: false, httpOnly: true },
   })
 );
 app.use(indexRoutes);
