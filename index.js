@@ -17,7 +17,12 @@ app.use(
     secret: "secret",
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 3600000 * 24, secure: false, httpOnly: true },
+    cookie: {
+      maxAge: 3600000 * 24,
+      secure: false,
+      httpOnly: true,
+      sameSite: "none",
+    },
   })
 );
 app.use(indexRoutes);
