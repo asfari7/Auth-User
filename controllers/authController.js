@@ -119,22 +119,7 @@ const signIn = async (req, res, next) => {
           expiresIn: "24h",
         }
       );
-
-      req.session.regenerate(function (err) {
-        if (err) {
-          next(err);
-        }
-
-        req.session.token = token;
-
-        req.session.save((err) => {
-          if (err) {
-            next(err);
-          }
-        });
-      });
-
-      // req.session.token = token;
+      req.session.token = token;
       return sendSuccess(
         res,
         { uuid: user.uuid, name: user.name, email: user.email, token },

@@ -16,11 +16,11 @@ app.use(
   session({
     secret: "secret",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
-      maxAge: 3600000 * 24,
-      secure: true,
+      secure: false,
       httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
     },
   })
 );
