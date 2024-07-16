@@ -135,6 +135,10 @@ const config = {
         "fromEnvVar": null,
         "value": "windows",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -161,8 +165,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel user {\n  uuid        String  @id @db.VarChar(36)\n  name        String  @db.VarChar(255)\n  email       String  @unique(map: \"email\") @db.VarChar(255)\n  password    String  @db.VarChar(255)\n  is_verified Boolean @default(false)\n}\n\nmodel verification_user {\n  id       Int      @id @default(autoincrement())\n  email    String   @unique(map: \"email\") @db.VarChar(255)\n  otp      String   @db.VarChar(6)\n  createAt DateTime @default(now()) @db.Timestamp(0)\n}\n",
-  "inlineSchemaHash": "3356f6d6697bc4fe90f8025fb0a0f8d6392420077fae3ac2d29d212e91139cce",
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  output        = \"./\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel user {\n  uuid        String  @id @db.VarChar(36)\n  name        String  @db.VarChar(255)\n  email       String  @unique(map: \"email\") @db.VarChar(255)\n  password    String  @db.VarChar(255)\n  is_verified Boolean @default(false)\n}\n\nmodel verification_user {\n  id       Int      @id @default(autoincrement())\n  email    String   @unique(map: \"email\") @db.VarChar(255)\n  otp      String   @db.VarChar(6)\n  createAt DateTime @default(now()) @db.Timestamp(0)\n}\n",
+  "inlineSchemaHash": "aba62a54a2eb5a29138dfda0efaf5b70ca68906820996dd2d313bedfb366695e",
   "copyEngine": true
 }
 
@@ -202,6 +206,10 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "query_engine-windows.dll.node");
 path.join(process.cwd(), "prisma/query_engine-windows.dll.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-rhel-openssl-3.0.x.so.node");
+path.join(process.cwd(), "prisma/libquery_engine-rhel-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "prisma/schema.prisma")
