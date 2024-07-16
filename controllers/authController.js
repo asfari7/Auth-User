@@ -108,9 +108,9 @@ const signIn = async (req, res, next) => {
     const isMatch = await comparePassword(password, user.password);
 
     if (!isMatch) {
-      return sendError(res, "Invalid credentials", 400);
+      return sendError(res, "Invalid password", 400);
     } else if (!user.is_verified && isMatch) {
-      return sendError(res, "User not activated", 400);
+      return sendError(res, "User not activated", 401);
     } else {
       const token = jwt.sign(
         { uuid: user.uuid, name: user.name },
@@ -131,4 +131,9 @@ const signIn = async (req, res, next) => {
   }
 };
 
-module.exports = { signUp, activation, resetPassword, signIn };
+const signOut = async (req, res) => {
+  req.session.destroy();
+  return sendSuccess(res, {}, "User signed out successfully");
+};
+
+module.exports = { signUp, activation, resetPassword, signIn, signOut };

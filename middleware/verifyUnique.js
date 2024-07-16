@@ -12,7 +12,7 @@ const verifyUnique = async (req, res, next) => {
       },
     });
     if (user) {
-      return sendError(res, "User already exists", 400);
+      return sendError(res, "Email already exists", 400);
     }
     next();
   } catch (error) {
