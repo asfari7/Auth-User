@@ -5,7 +5,7 @@ const indexRoutes = require("./routes/indexRoutes");
 
 const app = express();
 const corsOptions = {
-  origin: ["https://auth-user-psi.vercel.app", "http://localhost:5173"],
+  origin: "https://auth-user-psi.vercel.app",
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -19,8 +19,7 @@ app.use(
     resave: false,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24,
-      secure: true,
-      sameSite: "none",
+      sameSite: "strict",
     },
   })
 );
