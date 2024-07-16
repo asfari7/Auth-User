@@ -6,6 +6,7 @@ const {
   activation,
   resetPassword,
   signIn,
+  signOut,
 } = require("../controllers/authController");
 const { verifyUnique } = require("../middleware/verifyUnique");
 const { verifyOtp } = require("../middleware/verifyOtp");
@@ -33,5 +34,7 @@ router.get("/user-data", authenticateJWT, (req, res) => {
     },
   });
 });
+
+router.delete("/signOut", signOut);
 
 module.exports = router;

@@ -26,11 +26,26 @@ const sendOtp = async (email) => {
 const requestOtp = async (req, res) => {
   try {
     const { email } = req.body;
-    const otp = generateOTP();
 
     if (!email) {
       return sendError(res, "Email is required", 400);
     }
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (!user) {
+        return sendError(res, "User not found", 404);
+      }
+    } catch (error) {
+      return sendError(res, error.message, 400);
+    }
+
+    const otp = generateOTP();
 
     const data = await prisma.verification_user.findUnique({
       where: {
@@ -39,7 +54,14 @@ const requestOtp = async (req, res) => {
     });
 
     if (!data) {
-      return sendError(res, "Email not found", 400);
+      await prisma.verification_user.create({
+        data: {
+          email,
+          otp,
+        },
+      });
+      sendMail(email, otp);
+      return sendSuccess(res, { email }, "OTP sent");
     } else if (data.createAt > Date.now() - 60 * 1000) {
       return sendError(
         res,
