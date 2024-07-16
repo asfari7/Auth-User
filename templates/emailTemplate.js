@@ -19,8 +19,10 @@ const template = (OtpCode) => `<html lang="id">
             max-width: 600px;
         }
         .header {
-            text-align: center;
-            padding: 10px 0;
+            color: #ffffff;
+            text-align: left;
+            padding: 10px 20px;
+            background-color: hsla(221, 100%, 59%, 0.9);
             border-bottom: 1px solid #dddddd;
         }
         .header img {
@@ -28,7 +30,7 @@ const template = (OtpCode) => `<html lang="id">
         }
         .content {
             padding: 20px;
-            text-align: center;
+            text-align: left;
         }
         .otp {
             font-size: 24px;
@@ -49,16 +51,12 @@ const template = (OtpCode) => `<html lang="id">
 <body>
     <div class="container">
         <div class="header">
-            <img src="your-logo-url.png" alt="Logo">
+            <h1>Kode OTP Anda</h1>
         </div>
         <div class="content">
-            <h1>Kode OTP Anda</h1>
-            <p>Gunakan kode OTP di bawah ini untuk melanjutkan proses verifikasi akun Anda. Kode ini akan berlaku selama 10 menit.</p>
+            <p>Gunakan kode OTP di bawah ini untuk melanjutkan proses verifikasi akun Anda. Kode ini akan berlaku selama 5 menit.</p>
             <p class="otp">${OtpCode}</p>
             <p>Jika Anda tidak meminta kode OTP ini, silakan abaikan email ini.</p>
-        </div>
-        <div class="footer">
-            <p>&copy; 2024 Perusahaan Anda. Semua hak dilindungi.</p>
         </div>
     </div>
 </body>

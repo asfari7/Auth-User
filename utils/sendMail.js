@@ -2,8 +2,7 @@ const nodeMailer = require("nodemailer");
 const template = require("../templates/emailTemplate");
 
 const transporter = nodeMailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
+  host: process.env.HOST_SMTP,
   port: 587,
   secure: false,
   auth: {
@@ -17,8 +16,9 @@ function sendMail(to, OTP) {
     const mailOptions = {
       from: {
         name: "OTP Verification code",
-        address: process.env.EMAIL,
+        address: "no-reply@gmail.com",
       },
+      replyTo: process.env.EMAIL,
       to,
       subject: "OTP Verification code",
       html: template(OTP),

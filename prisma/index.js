@@ -124,7 +124,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\Asfari\\Project WEB\\BE_Invitation_App\\prisma",
+      "value": "D:\\Asfari\\Project WEB\\BE-Auth\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -138,7 +138,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\Asfari\\Project WEB\\BE_Invitation_App\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\Asfari\\Project WEB\\BE-Auth\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -152,7 +152,6 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
